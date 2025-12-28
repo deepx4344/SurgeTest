@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <h1>Surge API Tester</h1>
+            </div>
+            <div class="theme-toggle">
+                <!-- Future theme toggle -->
+            </div>
+        </header>
+
+        <main>
+            <section class="request-section glass-panel">
+                <div class="url-bar">
+                    <select id="method" class="method-select">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                    </select>
+                    <input type="text" id="url" placeholder="Enter request URL (e.g., https://api.example.com/v1/users)" autocomplete="off">
+                    <button id="send-btn" class="primary-btn">
+                        <span>Send</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="params">Params</button>
+                    <button class="tab-btn" data-tab="headers">Headers</button>
+                    <button class="tab-btn" data-tab="body">Body</button>
+                </div>
+
+                <div class="tab-content">
+                    <div id="params" class="tab-pane active">
+                        <div class="empty-state">Query params will be automatically extracted from the URL.</div>
+                    </div>
+                    
+                    <div id="headers" class="tab-pane">
+                        <div class="key-value-list" id="headers-list">
+                            <div class="key-value-row">
+                                <input type="text" placeholder="Key" class="header-key">
+                                <input type="text" placeholder="Value" class="header-value">
+                                <button class="remove-row-btn" title="Remove header">&times;</button>
+                            </div>
+                        </div>
+                        <button id="add-header-btn" class="secondary-btn small">+ Add Header</button>
+                    </div>
+
+                    <div id="body" class="tab-pane">
+                        <div class="body-options">
+                            <label><input type="radio" name="body-type" value="none" checked> None</label>
+                            <label><input type="radio" name="body-type" value="json"> JSON</label>
+                            <label><input type="radio" name="body-type" value="text"> Text</label>
+                        </div>
+                        <div id="body-editor-container" class="hidden">
+                            <textarea id="request-body" placeholder="{ &quot;key&quot;: &quot;value&quot; }"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="response-section glass-panel">
+                <div class="response-header">
+                    <h2>Response</h2>
+                    <div class="response-meta hidden" id="response-meta">
+                        <span class="meta-item status"><span class="label">Status:</span> <span id="status-code" class="value"></span></span>
+                        <span class="meta-item time"><span class="label">Time:</span> <span id="response-time" class="value"></span></span>
+                        <span class="meta-item size"><span class="label">Size:</span> <span id="response-size" class="value"></span></span>
+                    </div>
+                </div>
+                
+                <div class="response-body-container" id="response-container">
+                    <div class="placeholder-content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        <p>Enter a URL and click Send to get a response</p>
+                    </div>
+                    <pre id="response-output" class="hidden"><code id="response-code"></code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
