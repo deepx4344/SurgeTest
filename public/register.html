@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Register • Surge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .auth-wrapper { max-width:420px; margin:64px auto; }
+      .auth-form { display:flex; flex-direction:column; gap:12px; }
+      label { font-size:0.9rem; color:var(--text-muted); }
+      input[type="email"], input[type="password"] { padding:12px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-main); outline:none; }
+      input:focus { border-color:var(--primary-color); box-shadow:0 0 0 4px rgba(99,102,241,0.06); }
+      .muted { font-size:0.9rem; color:var(--text-muted); }
+      #msg { min-height:20px; font-size:0.95rem; }
+      .msg-success { color:var(--success-color); }
+      .msg-error { color:var(--error-color); }
+      .actions { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+      .link { color:var(--text-muted); text-decoration:none; font-size:0.95rem; }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <header>
+        <div class="logo"><h1>Surge</h1></div>
+      </header>
+
+      <main>
+        <section class="glass-panel auth-wrapper">
+          <h2 style="margin-bottom:8px;">Create an account</h2>
+          <p class="muted" style="margin-bottom:18px;">Sign up with your email and a password.</p>
+
+          <form id="auth-form" class="auth-form" data-endpoint="/api/auth/register">
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="you@example.com" required>
+            </div>
+
+            <div>
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" placeholder="Enter a secure password" required>
+            </div>
+
+            <div id="msg"></div>
+
+            <div class="actions">
+              <a class="link" href="/login.html">Already have an account? Log in</a>
+              <button type="submit" class="primary-btn">Submit</button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="auth.js"></script>
+  </body>
+</html>
