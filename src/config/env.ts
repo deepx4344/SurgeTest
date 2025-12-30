@@ -15,7 +15,7 @@ const processConfig = {
   enviroment: process.env["NODE_ENV"],
   port: process.env["PORT"],
   bcryptRounds: process.env["BCRYPT_ROUNDS"],
-  HOST: process.env["HOST"],
+  host: process.env["HOST"],
   mailer:{
     user:process.env["gmailUser"],
     pass:process.env["gmailPassword"]

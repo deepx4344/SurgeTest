@@ -424,3 +424,8 @@ header {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
 }
+
+/* Auth message details (used on login/register pages) */
+.msg-status { font-size:0.85rem; color:var(--text-muted); margin-bottom:6px; }
+.msg-text { margin-bottom:8px; }
+.msg-details { background: rgba(255,255,255,0.03); padding:8px; border-radius:6px; white-space:pre-wrap; font-family: var(--font-mono); font-size:0.85rem; color:var(--text-main); margin-top:8px; }

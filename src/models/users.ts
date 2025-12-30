@@ -13,7 +13,7 @@ const usersSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    id: {
+    Gid: {
       type: String,
     },
     userReg: {

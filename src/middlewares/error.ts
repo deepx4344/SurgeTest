@@ -30,12 +30,22 @@ const errormiddleWare = (
       case 409:
         message = err.message || "Conflict";
         break;
+      case 502:
+        message = err.message || "Bad Gatewat";
+        break;
       default:
         message = err.message || message;
         break;
     }
   } else {
-    logger.error(err);
+    if (err && typeof err === "object" && "statusCode" in (err as any)) {
+      const anyErr = err as any;
+      statusCode = anyErr.statusCode || statusCode;
+      message = anyErr.message || message;
+      logger.error("Handled error object with statusCode", anyErr);
+    } else {
+      logger.error(err);
+    }
   }
 
   const dataToSend: ApiResponseinput = {

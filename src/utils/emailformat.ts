@@ -2,6 +2,8 @@ import logger from "../middlewares/logger.js";
 import processConfig from "../config/env.js";
 import { generateToken } from "./jwt.js";
 import { JWTPayload } from "../types/index.js";
+import { createServiceError } from "./index.js";
+
 const emailFormat = async (
   payload: JWTPayload,
   key: string,
@@ -9,7 +11,7 @@ const emailFormat = async (
 ): Promise<{ html: string; text: string } | undefined> => {
   try {
     const token: string = await generateToken(payload, key, duration);
-    const uriFormat: string = `http://${processConfig.HOST}/api/verify/${token}`;
+    const uriFormat: string = `http://${processConfig.host}/api/verify/${token}`;
     const appName: string = processConfig.name || "SurgeTest";
 
     const htmlFormat = `
@@ -48,7 +50,7 @@ const emailFormat = async (
                 </tr>
                 <tr>
                   <td style="padding:14px 24px; background:#f3f6fb; color:#9ca3af; font-size:12px; text-align:center;">
-                    <div>${appName} • ${processConfig.HOST}</div>
+                    <div>${appName} • ${processConfig.host}</div>
                   </td>
                 </tr>
               </table>
@@ -58,12 +60,12 @@ const emailFormat = async (
       </body>
       </html>
     `;
-    const textFormat = `${appName} - Verify your email\n\nThanks for trying ${appName}!\n\nCopy and paste the link below into your browser to verify your email:\n\n${uriFormat}\n\nIf you did not request this, you can safely ignore this email.\n\nThis link will expire in ${duration}.\n\n${appName} • ${processConfig.HOST}`;
+    const textFormat = `${appName} - Verify your email\n\nThanks for trying ${appName}!\n\nCopy and paste the link below into your browser to verify your email:\n\n${uriFormat}\n\nIf you did not request this, you can safely ignore this email.\n\nThis link will expire in ${duration}.\n\n${appName} • ${processConfig.host}`;
 
     return { html: htmlFormat, text: textFormat };
   } catch (e) {
     logger.error("Error from genToken and Format", { error: e });
-    return;
+    throw createServiceError("Something went wrong", 500);
   }
 };
 export default emailFormat;

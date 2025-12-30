@@ -1,11 +1,12 @@
 import { JWTPayload } from "../types/index.js";
-import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import jwt, { JwtPayload, SignOptions} from "jsonwebtoken";
 
 export const generateToken = async (
   payload: JWTPayload,
   key: string,
   duration: string
 ): Promise<string> => {
+  
   const options: SignOptions = {
     expiresIn: duration as any,
   };

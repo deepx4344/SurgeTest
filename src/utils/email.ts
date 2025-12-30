@@ -3,6 +3,8 @@ import emailFormat from "./emailformat.js";
 import logger from "../middlewares/logger.js";
 import { JWTPayload } from "../types/index.js";
 import processConfig from "../config/env.js";
+import { createServiceError } from "./index.js";
+
 export const verificationEmail = async (
   to: string,
   payload: JWTPayload,
@@ -25,13 +27,18 @@ export const verificationEmail = async (
       html: format?.html,
       text: format?.text,
     });
-    transporter.verify(function (error, success) {
-      if (error) {
-        logger.error(`Connection Error: ${error}`);
-      } else {
-        logger.info("Server is ready to send messages.");
-      }
-    });
+    try {
+      transporter.verify(function (error, success) {
+        if (error) {
+          logger.error(`Connection Error: ${error}`);
+        } else {
+          logger.info("Server is ready to send messages.");
+        }
+      });
+    } catch (e) {
+      logger.error("Error from transporter verify", { error: e });
+      throw createServiceError("Something Went Error", 502);
+    }
   } catch (e) {
     logger.error("Error from send Emails", { error: e });
   }
