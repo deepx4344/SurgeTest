@@ -31,6 +31,7 @@ export interface ApiResponseinput {
   success: boolean;
   message: string;
   token?: string;
+  tokens?: Tokens;
   data?: object;
   datas?: Record<string, string[]> | object[];
   error?: string;

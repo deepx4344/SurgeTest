@@ -24,7 +24,7 @@ class AuthService {
     processConfig.bcryptRounds
   );
 
-  register = async (email: string, password: string): Promise<void> => {
+  register = async (email: string, password: string): Promise<string> => {
     try {
       const userExists = await Users.findOne({ email: email.trim() });
       if (userExists) {
@@ -61,9 +61,9 @@ class AuthService {
         id: dUser.id.toString(),
         paid: dUser.paid,
       };
-
+      let token: string = "";
       try {
-        await verificationEmail(
+        token = await verificationEmail(
           dUser.email as string,
           payLoad,
           this.emailVerificationKey,
@@ -71,7 +71,9 @@ class AuthService {
         );
       } catch (emailErr: unknown) {
         logger.error("Verification email failed", { error: emailErr });
-        throw createServiceError("Verification email failed", 502);
+        throw createServiceError("Verification email failed", 503);
+      } finally {
+        return token;
       }
     } catch (e: unknown) {
       if (e instanceof ServiceError) throw e;
@@ -86,15 +88,15 @@ class AuthService {
     if (!user) {
       throw createServiceError("Invalid Credentials", 401);
     }
+    if (!user.verified) {
+      throw createServiceError("Please verify before logging in", 403);
+    }
     const passwordCheck = await bcrypt.compare(
       password,
       user.password as string
     );
     if (!passwordCheck) {
       throw createServiceError("Invalid Credentials", 401);
-    }
-    if (!user.verified) {
-      throw createServiceError("Please verify before logging in", 403);
     }
     const payload: JWTPayload = {
       email: user.email as string,

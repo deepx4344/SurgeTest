@@ -7,10 +7,11 @@ const auth = new AuthService();
 
 export const register = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  await auth.register(email, password);
+  const token: string = await auth.register(email, password);
   const dataToSend: ApiResponseinput = {
     success: true,
     message: "User Created Successfully",
+    token: token,
   };
   return res.status(201).json(createAPIResponse(dataToSend));
 });
@@ -36,7 +37,7 @@ export const login = asyncHandler(async (req, res) => {
 export const verify = asyncHandler(async (req, res) => {
   const token = req.params.token;
   await auth.verify(token);
-  return res.redirect("/login");
+  return res.status(302).redirect("/login");
 });
 export const logout = asyncHandler(async (req, res) => {
   const tokens: Tokens = req.signedCookies["tokens"];

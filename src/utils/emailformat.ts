@@ -8,9 +8,10 @@ export const verificationEmailFormat = async (
   payload: JWTPayload,
   key: string,
   duration: string
-): Promise<{ html: string; text: string } | undefined> => {
+): Promise<{ html: string; text: string; token: string } | undefined> => {
+  let token: string;
   try {
-    const token: string = await generateToken(payload, key, duration);
+    token = await generateToken(payload, key, duration);
     const uriFormat: string = `http://${processConfig.host}/api/auth/verify/${token}`;
     const appName: string = processConfig.name || "SurgeTest";
 
@@ -62,7 +63,7 @@ export const verificationEmailFormat = async (
     `;
     const textFormat = `${appName} - Verify your email\n\nThanks for trying ${appName}!\n\nCopy and paste the link below into your browser to verify your email:\n\n${uriFormat}\n\nIf you did not request this, you can safely ignore this email.\n\nThis link will expire in ${duration}.\n\n${appName} • ${processConfig.host}`;
 
-    return { html: htmlFormat, text: textFormat };
+    return { html: htmlFormat, text: textFormat, token: token };
   } catch (e) {
     logger.error("Error from genToken and Format", { error: e });
     throw createServiceError("Something went wrong", 500);

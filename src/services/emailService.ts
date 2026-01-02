@@ -10,9 +10,10 @@ export const verificationEmail = async (
   payload: JWTPayload,
   key: string,
   duration: string
-) => {
+): Promise<string> => {
+  let format;
   try {
-    let format = await verificationEmailFormat(payload, key, duration);
+    format = await verificationEmailFormat(payload, key, duration);
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -37,5 +38,7 @@ export const verificationEmail = async (
   } catch (e) {
     logger.error("Error from send Emails", { error: e });
     throw createServiceError("SomeThing Went Wrong", 503);
+  } finally {
+    return format?.token as string;
   }
 };

@@ -24,4 +24,3 @@ const Interval = setInterval(clearBlackList, timeToClear);
 export const clearIntervalOnCall = async (): Promise<void> => {
   clearInterval(Interval);
 };
-
