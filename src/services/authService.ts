@@ -1,16 +1,21 @@
 import bcrypt from "bcrypt";
-import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
-
+import jwt from "jsonwebtoken";
+const { JsonWebTokenError, TokenExpiredError } = jwt;
 import { createServiceError } from "../utils/index.js";
 import processConfig from "../config/env.js";
 import Users from "../models/users.js";
-import { JWTPayload, ServiceError } from "../types/index.js";
-import { verificationEmail } from "../utils/email.js";
+import { JWTPayload, ServiceError, Tokens } from "../types/index.js";
+import { verificationEmail } from "./emailService.js";
 import logger from "../middlewares/logger.js";
 import { generateToken, verifyToken } from "../utils/jwt.js";
+import { addToBlackList } from "../utils/blackList.js";
 class AuthService {
-  private readonly authSecret: string = processConfig.JWTs.secret!;
-  private readonly authSecretDuration: string = processConfig.JWTs.duration!;
+  private readonly authSecret: string = processConfig.JWTs.access.key!;
+  private readonly authSecretDuration: string =
+    processConfig.JWTs.access.duration!;
+  private readonly refreshSecret: string = processConfig.JWTs.refresh.key!;
+  private readonly refreshSecretDuration: string =
+    processConfig.JWTs.refresh.duration!;
   private readonly emailVerificationKey: string =
     processConfig.JWTs.verifyEmail.key!;
   private readonly emailVerificationDuration: string =
@@ -34,7 +39,6 @@ class AuthService {
       let newUser = new Users({
         email: email.trim(),
         password: hashedPassword,
-        userReg: true,
       });
 
       let dUser;
@@ -53,8 +57,9 @@ class AuthService {
       }
 
       const payLoad: JWTPayload = {
-        userReg: true,
         email: dUser.email as string,
+        id: dUser.id.toString(),
+        paid: dUser.paid,
       };
 
       try {
@@ -74,8 +79,10 @@ class AuthService {
       throw createServiceError("Registration failed", 500);
     }
   };
-  login = async (email: string, password: string): Promise<string> => {
-    const user = await Users.findOne({ email: email.trim() });
+  login = async (email: string, password: string): Promise<Tokens> => {
+    const user = await Users.findOne({ email: email.trim() }).select(
+      "+password"
+    );
     if (!user) {
       throw createServiceError("Invalid Credentials", 401);
     }
@@ -90,17 +97,20 @@ class AuthService {
       throw createServiceError("Please verify before logging in", 403);
     }
     const payload: JWTPayload = {
-      userReg: true,
       email: user.email as string,
-      id: user.id,
+      id: user.id.toString(),
+      paid: user.paid,
     };
-    let token: string;
+    let accessToken: string;
+    let refreshToken: string;
     try {
-      token = await generateToken(
-        payload,
-        this.authSecret,
-        this.authSecretDuration
-      );
+      let assignment = [
+        generateToken(payload, this.authSecret, this.authSecretDuration),
+        generateToken(payload, this.refreshSecret, this.refreshSecretDuration),
+      ];
+      const processed = await Promise.all(assignment);
+      accessToken = processed[0];
+      refreshToken = processed[1];
     } catch (err: unknown) {
       if (err instanceof TokenExpiredError) {
         logger.error(`Token expired at: ${err.expiredAt}`);
@@ -113,7 +123,7 @@ class AuthService {
         throw createServiceError("Could not generate token", 500);
       }
     }
-    return token;
+    return { accessToken, refreshToken };
   };
   verify = async (token: string): Promise<void> => {
     const result: JWTPayload = (await verifyToken(
@@ -121,6 +131,9 @@ class AuthService {
       this.emailVerificationKey
     )) as JWTPayload;
     await Users.findOneAndUpdate({ email: result.email }, { verified: true });
+  };
+  logout = async (token: string): Promise<void> => {
+    await addToBlackList(token);
   };
 }
 

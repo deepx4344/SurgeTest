@@ -1,9 +1,9 @@
-import { User,JWTPayLoadOutput } from "./index.ts";
+import { User,JWTPayload } from "./index.ts";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: JWTPayLoadOutput;
+      user?: JWTPayLoad;
     }
   }
 }

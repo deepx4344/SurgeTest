@@ -6,7 +6,7 @@ const { combine, timestamp, printf, colorize, errors } = winston.format;
 
 const LogDirectoryPath = path.join(import.meta.dirname, "..", "logs");
 const errorLogPath = path.join(LogDirectoryPath, "error.log");
-const combinedLogPath = path.join(LogDirectoryPath, "combine.log");
+const infoLogPath = path.join(LogDirectoryPath, "info.log");
 
 if (!fs.existsSync(LogDirectoryPath)) {
   fs.mkdirSync(LogDirectoryPath);
@@ -24,7 +24,7 @@ const logger = winston.createLogger({
     logFormat
   ),
   transports: [
-    new winston.transports.File({ filename: combinedLogPath }),
+    new winston.transports.File({ filename: infoLogPath, level: "info" }),
     new winston.transports.File({ filename: errorLogPath, level: "error" }),
     new winston.transports.Console({
       format: combine(colorize(), logFormat),

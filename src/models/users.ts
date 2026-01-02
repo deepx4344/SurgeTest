@@ -5,20 +5,21 @@ const usersSchema = new mongoose.Schema(
     email: {
       type: String,
       unique: true,
+      lowercase: true,
+      required: true,
     },
     password: {
       type: String,
+      required: true,
+      select:false
     },
     verified: {
       type: Boolean,
       default: false,
     },
-    Gid: {
-      type: String,
-    },
-    userReg: {
+    paid: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   {

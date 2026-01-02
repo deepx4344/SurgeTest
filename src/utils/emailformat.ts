@@ -4,14 +4,14 @@ import { generateToken } from "./jwt.js";
 import { JWTPayload } from "../types/index.js";
 import { createServiceError } from "./index.js";
 
-const emailFormat = async (
+export const verificationEmailFormat = async (
   payload: JWTPayload,
   key: string,
   duration: string
 ): Promise<{ html: string; text: string } | undefined> => {
   try {
     const token: string = await generateToken(payload, key, duration);
-    const uriFormat: string = `http://${processConfig.host}/api/verify/${token}`;
+    const uriFormat: string = `http://${processConfig.host}/api/auth/verify/${token}`;
     const appName: string = processConfig.name || "SurgeTest";
 
     const htmlFormat = `
@@ -68,4 +68,3 @@ const emailFormat = async (
     throw createServiceError("Something went wrong", 500);
   }
 };
-export default emailFormat;

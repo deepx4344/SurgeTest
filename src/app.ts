@@ -2,10 +2,11 @@ import express, { Express } from "express";
 import morgan from "morgan";
 import compression from "compression";
 import path from "path";
-import cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 import processConfig from "./config/env.js";
 import errormiddleWare from "./middlewares/error.js";
 import authRoutes from "./routes/auth.js";
+import authMiddleware from "./middlewares/auth.js";
 const publicPath = path.join(import.meta.dirname, "..", "public");
 const app: Express = express();
 const development: boolean = processConfig.enviroment === "development";
@@ -23,7 +24,7 @@ app.get("/favicon.ico", (req, res) => {
 
 app.use(
   express.static(publicPath, {
-    etag: true,   
+    etag: true,
     maxAge: 31536000000,
     setHeaders: (res, pathName) => {
       if (pathName.endsWith(".html")) {
@@ -38,6 +39,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
+
+app.use(authMiddleware);
+
 
 app.use(errormiddleWare);
 export default app;

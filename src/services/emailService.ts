@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
-import emailFormat from "./emailformat.js";
+import { verificationEmailFormat } from "../utils/emailformat.js";
 import logger from "../middlewares/logger.js";
 import { JWTPayload } from "../types/index.js";
 import processConfig from "../config/env.js";
-import { createServiceError } from "./index.js";
+import { createServiceError } from "../utils/index.js";
 
 export const verificationEmail = async (
   to: string,
@@ -12,7 +12,7 @@ export const verificationEmail = async (
   duration: string
 ) => {
   try {
-    let format = await emailFormat(payload, key, duration);
+    let format = await verificationEmailFormat(payload, key, duration);
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -27,19 +27,15 @@ export const verificationEmail = async (
       html: format?.html,
       text: format?.text,
     });
-    try {
-      transporter.verify(function (error, success) {
-        if (error) {
-          logger.error(`Connection Error: ${error}`);
-        } else {
-          logger.info("Server is ready to send messages.");
-        }
-      });
-    } catch (e) {
-      logger.error("Error from transporter verify", { error: e });
-      throw createServiceError("Something Went Error", 502);
-    }
+    transporter.verify(function (error, success) {
+      if (error) {
+        logger.error(`Connection Error: ${error}`);
+      } else {
+        logger.info("Server is ready to send messages.");
+      }
+    });
   } catch (e) {
     logger.error("Error from send Emails", { error: e });
+    throw createServiceError("SomeThing Went Wrong", 503);
   }
 };

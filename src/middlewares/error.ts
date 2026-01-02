@@ -31,7 +31,7 @@ const errormiddleWare = (
         message = err.message || "Conflict";
         break;
       case 502:
-        message = err.message || "Bad Gatewat";
+        message = err.message || "Bad Gateway";
         break;
       default:
         message = err.message || message;

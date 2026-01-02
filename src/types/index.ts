@@ -38,7 +38,11 @@ export interface ApiResponseinput {
 }
 
 export interface JWTPayload {
-  userReg: boolean;
-  id?: string;
-  email?: string;
+  id: string;
+  email: string;
+  paid: boolean;
+}
+export interface Tokens {
+  accessToken: string;
+  refreshToken: string;
 }
