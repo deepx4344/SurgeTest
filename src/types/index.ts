@@ -32,7 +32,7 @@ export interface ApiResponseinput {
   message: string;
   token?: string;
   tokens?: Tokens;
-  data?: object;
+  data?: object | string;
   datas?: Record<string, string[]> | object[];
   error?: string;
   errors?: Record<string, string[]>;
@@ -46,4 +46,10 @@ export interface JWTPayload {
 export interface Tokens {
   accessToken: string;
   refreshToken: string;
+}
+export interface configs {
+  paid: boolean;
+  concurent: number;
+  totalPerTest: number;
+  testPerHour: number;
 }

@@ -134,6 +134,15 @@ class AuthService {
     )) as JWTPayload;
     await Users.findOneAndUpdate({ email: result.email }, { verified: true });
   };
+  refresh = async (token: string): Promise<string> => {
+    const verified: JWTPayload = await verifyToken(token, this.refreshSecret);
+    const newToken: string = await generateToken(
+      verified,
+      this.authSecret,
+      this.authSecretDuration
+    );
+    return newToken;
+  };
   logout = async (token: string): Promise<void> => {
     await addToBlackList(token);
   };

@@ -23,7 +23,7 @@ export const login = asyncHandler(async (req, res) => {
     success: true,
     message: "User Logged In Successfully",
   };
-  res.cookie("token", tokens, {
+  res.cookie("tokens", tokens, {
     signed: Boolean(processConfig.cookie.key),
     maxAge:
       parseInt(processConfig.JWTs.refresh.duration!, 10) * 24 * 60 * 60 * 1000,
@@ -31,19 +31,35 @@ export const login = asyncHandler(async (req, res) => {
     secure: processConfig.enviroment === "production",
     sameSite: "lax",
   });
+
   return res.status(200).json(createAPIResponse(dataToSend));
 });
 
 export const verify = asyncHandler(async (req, res) => {
   const token = req.params.token;
   await auth.verify(token);
-  return res.status(302).redirect("/login");
+  return res.status(200).end();
 });
+
 export const logout = asyncHandler(async (req, res) => {
   const tokens: Tokens = req.signedCookies["tokens"];
   const accessToken: string = tokens.accessToken;
   await auth.logout(accessToken);
   res.clearCookie("tokens", {
     signed: Boolean(processConfig.cookie.key),
+  });
+  res.status(204).end();
+});
+export const refresh = asyncHandler(async (req, res) => {
+  const tokens: Tokens = req.signedCookies["tokens"];
+  const newToken: string = await auth.refresh(tokens.refreshToken);
+  tokens.accessToken = newToken;
+  res.cookie("tokens", tokens, {
+    signed: Boolean(processConfig.cookie.key),
+    maxAge:
+      parseInt(processConfig.JWTs.refresh.duration!, 10) * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: processConfig.enviroment === "production",
+    sameSite: "lax",
   });
 });

@@ -7,7 +7,7 @@ import validateConfig from "./config/validenv.js";
 const port: number = Number(processConfig.port);
 
 validateConfig(processConfig).then(() => {
-  logger.info("Config Checked Successfully");
+  logger.info("Enviroment Variables Confirmed");
   connectDB().then(() => {
     app.listen(port, () => {
       logger.info(`Server Started on port ${port}`);
