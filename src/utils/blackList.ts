@@ -1,4 +1,3 @@
-// Using In memory, Ensure To use Redis before pushing to production
 import processConfig from "../config/env.js";
 
 const timeToClear: number =
