@@ -10,8 +10,8 @@ export const verificationEmail = async (
   to: string,
   payload: JWTPayload,
   key: string,
-  duration: string
-): Promise<string> => {
+  duration: string,
+): Promise<void> => {
   let format;
   try {
     format = await verificationEmailFormat(payload, key, duration);
@@ -31,15 +31,13 @@ export const verificationEmail = async (
     });
     transporter.verify(function (error, success) {
       if (error) {
-        logger.error(`Connection Error: ${error}`);
+        logger.error(`Connection Error: `,error);
       } else {
         logger.info("Server is ready to send messages.");
       }
     });
   } catch (e) {
-    logger.error("Error from send Emails", { error: e });
+    logger.error("Error from send Emails", e);
     throw createServiceError("SomeThing Went Wrong", 503);
-  } finally {
-    return format?.token as string;
   }
 };

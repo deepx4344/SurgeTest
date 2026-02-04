@@ -1,12 +1,8 @@
-export interface User {
-  _id: string;
-  email: string;
-  password?: string;
-  verified: boolean;
-  paid: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import { InferSchemaType } from "mongoose";
+import { usersSchema } from "../models/users.js";
+import { testSchema } from "../models/test.js";
+
+export type User =InferSchemaType<typeof usersSchema>
 
 export interface TestResults {
   totalRequests: number;
@@ -15,19 +11,7 @@ export interface TestResults {
   errors: string[];
 }
 
-export interface Test {
-  _id: string;
-  url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  headers?: Map<string, string>;
-  body?: any;
-  concurrency: number;
-  duration: number;
-  status: "pending" | "running" | "completed" | "failed";
-  results?: TestResults;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+export type Test = InferSchemaType<typeof testSchema>
 
 export interface ServiceErrorInput {
   message: string;
@@ -41,6 +25,7 @@ export interface ApiResponseinput {
   message: string;
   token?: string;
   tokens?: Tokens;
+  user?:User;
   data?: object | string;
   datas?: Record<string, string[]> | object[];
   error?: string;
@@ -58,7 +43,7 @@ export interface Tokens {
 }
 export interface configs {
   paid: boolean;
-  concurent: number;
+  concurrent: number;
   totalPerTest: number;
   testPerHour: number;
 }

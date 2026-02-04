@@ -12,7 +12,7 @@ const errormiddleWare = (
   next: NextFunction
 ) => {
   let statusCode: number = 500;
-  let message: string = "An Error Occured";
+  let message: string = "An Error Occurred";
 
   if (err instanceof ServiceError) {
     statusCode = err.statusCode;
@@ -24,7 +24,7 @@ const errormiddleWare = (
         message = err.message || "Unauthorized";
         break;
       case 403:
-        message = err.message || "Unauthorized";
+        message = err.message || "Forbidden";
         break;
       case 404:
         message = err.message || "Not Found";

@@ -30,7 +30,8 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/load", authMiddleware, loadRoutes);
 
-app.get("*", (req, res) => {
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/")) return next();
   res.sendFile(path.join(publicPath, "index.html"));
 });
 

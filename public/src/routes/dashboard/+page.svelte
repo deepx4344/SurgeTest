@@ -1,28 +1,32 @@
+<script lang="ts">
   import { onDestroy } from 'svelte';
   import { api } from '$lib/api';
   let url = '', concurrency = 50, duration = 30, status = '';
   let method = 'GET';
-  let headers = `{
-    "Content-Type":"application/json"
-  }`;
+  const defaultHeaders = { 'Content-Type': 'application/json' };
+  let headers = JSON.stringify(defaultHeaders);
   let body = '';
-  let pollInterval = any;
+  let pollInterval;
+  let running = false;
 
-  async function pollStatus(testId: string) {
+  async function pollStatus(testId) {
     try {
       const res = await api(`/api/load/${testId}`);
       status = `Status: ${res.status}`;
       
       if (res.status === 'completed' || res.status === 'failed') {
         clearInterval(pollInterval);
+        running = false
         status = `Test finished: ${res.status}. ${JSON.stringify(res.results || '')}`;
       }
     } catch (e) {
       console.error('Polling error', e);
+      status=`Polling error: ${e instanceof Error ? e.message : "Unable to fetch status"}`
     }
   }
 
   async function startTest() {
+    running = true
     status = 'Starting...';
     try {
       const parsedHeaders = headers ? JSON.parse(headers) : {};
@@ -44,6 +48,10 @@
       });
       
       const testId = res.test_id;
+      if(!testId){
+        status="Error: Server did not return a test ID"
+        return
+      }
       status = `Test started: ${testId}. Waiting for results...`;
       
       if (pollInterval) clearInterval(pollInterval);
@@ -51,12 +59,14 @@
       
     } catch (e) {
       status = `Error: ${e instanceof Error ? e.message : String(e)}`;
+      running = false
     }
   }
 
   onDestroy(() => {
     if (pollInterval) clearInterval(pollInterval);
   });
+</script>
 
 <div class="container">
   <h1>Dashboard</h1>
@@ -96,13 +106,13 @@
 
   <div class="form-group">
     <label>Request Body (JSON)</label>
-    <textarea bind:value={body} rows="6" placeholder="{JSON.stringify({ key: 'value' }, null, 2)}"></textarea>
+    <textarea bind:value={body} rows="6" placeholder="Enter JSON body (optional)"></textarea>
   </div>
 
-  <button on:click={startTest}>Run Load Test</button>
+  <button on:click={startTest} disabled={running}>{running? "Running...":"Run"}</button>
   
   {#if status}
-    <p class="status {status.startsWith('Error') ? 'error' : 'success'}">{status}</p>
+    <p class="status {status.startsWith('Error') ? 'error' : status.includes("finished") ? "success" : ""}">{status}</p>
   {/if}
 </div>
 

@@ -65,7 +65,7 @@ export const verificationEmailFormat = async (
 
     return { html: htmlFormat, text: textFormat, token: token };
   } catch (e) {
-    logger.error("Error from genToken and Format", { error: e });
+    logger.error("Error from genToken and Format", e);
     throw createServiceError("Something went wrong", 500);
   }
 };
