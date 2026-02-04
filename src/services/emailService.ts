@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+
 import { verificationEmailFormat } from "../utils/emailformat.js";
 import logger from "../middlewares/logger.js";
 import { JWTPayload } from "../types/index.js";

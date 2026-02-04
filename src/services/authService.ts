@@ -1,14 +1,17 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const { JsonWebTokenError, TokenExpiredError } = jwt;
+
 import { createServiceError } from "../utils/index.js";
 import processConfig from "../config/env.js";
 import Users from "../models/users.js";
-import { JWTPayload, ServiceError, Tokens } from "../types/index.js";
+import { JWTPayload, Tokens } from "../types/index.js";
 import { verificationEmail } from "./emailService.js";
 import logger from "../middlewares/logger.js";
 import { generateToken, verifyToken } from "../utils/jwt.js";
 import { addToBlackList } from "../utils/blackList.js";
+import { ServiceError } from "../utils/errors.js";
+
 class AuthService {
   private readonly authSecret: string = processConfig.JWTs.access.key!;
   private readonly authSecretDuration: string =
@@ -24,7 +27,7 @@ class AuthService {
     processConfig.bcryptRounds
   );
 
-  register = async (email: string, password: string): Promise<string> => {
+  register = async (email: string, password: string): Promise<void> => {
     try {
       const userExists = await Users.findOne({ email: email.trim() });
       if (userExists) {
@@ -41,40 +44,20 @@ class AuthService {
         password: hashedPassword,
       });
 
-      let dUser;
-      try {
-        dUser = await newUser.save();
-      } catch (saveErr: unknown) {
-        if (
-          saveErr &&
-          typeof saveErr === "object" &&
-          (saveErr as any).code === 11000
-        ) {
-          throw createServiceError("User already Exists", 409);
-        }
-        logger.error("DB save error during registration", { error: saveErr });
-        throw createServiceError("Failed to create user", 500);
-      }
+      const dUser = await newUser.save()
 
       const payLoad: JWTPayload = {
         email: dUser.email as string,
         id: dUser.id.toString(),
         paid: dUser.paid,
       };
-      let token: string = "";
-      try {
-        token = await verificationEmail(
-          dUser.email as string,
-          payLoad,
-          this.emailVerificationKey,
-          this.emailVerificationDuration
-        );
-      } catch (emailErr: unknown) {
-        logger.error("Verification email failed", { error: emailErr });
-        throw createServiceError("Verification email failed", 503);
-      } finally {
-        return token;
-      }
+      verificationEmail(
+        dUser.email as string,
+        payLoad,
+        this.emailVerificationKey,
+        this.emailVerificationDuration
+      );
+
     } catch (e: unknown) {
       if (e instanceof ServiceError) throw e;
       logger.error("Unexpected error in register", { error: e });
@@ -103,28 +86,14 @@ class AuthService {
       id: user.id.toString(),
       paid: user.paid,
     };
-    let accessToken: string;
-    let refreshToken: string;
-    try {
-      let assignment = [
-        generateToken(payload, this.authSecret, this.authSecretDuration),
-        generateToken(payload, this.refreshSecret, this.refreshSecretDuration),
-      ];
-      const processed = await Promise.all(assignment);
-      accessToken = processed[0];
-      refreshToken = processed[1];
-    } catch (err: unknown) {
-      if (err instanceof TokenExpiredError) {
-        logger.error(`Token expired at: ${err.expiredAt}`);
-        throw createServiceError("Token has expired", 401);
-      } else if (err instanceof JsonWebTokenError) {
-        logger.error(`Invalid Token ${err.message}`);
-        throw createServiceError("Invalid Token", 401);
-      } else {
-        logger.error("Error generating token", { error: err });
-        throw createServiceError("Could not generate token", 500);
-      }
-    }
+    let assignment = [
+      generateToken(payload, this.authSecret, this.authSecretDuration),
+      generateToken(payload, this.refreshSecret, this.refreshSecretDuration),
+    ];
+    const processed = await Promise.all(assignment);
+    const accessToken = processed[0];
+    const refreshToken = processed[1];
+
     return { accessToken, refreshToken };
   };
   verify = async (token: string): Promise<void> => {

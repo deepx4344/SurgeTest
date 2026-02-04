@@ -1,4 +1,5 @@
-import { ServiceError, ApiResponseinput } from "../types/index.js";
+import { ApiResponseinput } from "../types/index.js";
+import { ServiceError } from "./errors.js";
 
 export function createServiceError(
   message: string,

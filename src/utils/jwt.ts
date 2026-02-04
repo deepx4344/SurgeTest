@@ -1,7 +1,7 @@
-import { JWTPayload } from "../types/index.js";
 import jwt, { SignOptions } from "jsonwebtoken";
 const { JsonWebTokenError, TokenExpiredError } = jwt;
 
+import { JWTPayload } from "../types/index.js";
 import logger from "../middlewares/logger.js";
 import { createServiceError } from "./index.js";
 

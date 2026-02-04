@@ -1,25 +1,34 @@
 export interface User {
-  id: string;
-  registered: boolean;
-  email?: string;
+  _id: string;
+  email: string;
+  password?: string;
+  verified: boolean;
+  paid: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
-export class ServiceError extends Error {
-  statusCode: number;
-  code?: string;
-  details?: any;
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    code?: string,
-    details?: any
-  ) {
-    super(message);
-    this.name = "ServiceError";
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
-  }
+
+export interface TestResults {
+  totalRequests: number;
+  successCount: number;
+  failCount: number;
+  errors: string[];
 }
+
+export interface Test {
+  _id: string;
+  url: string;
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  headers?: Map<string, string>;
+  body?: any;
+  concurrency: number;
+  duration: number;
+  status: "pending" | "running" | "completed" | "failed";
+  results?: TestResults;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface ServiceErrorInput {
   message: string;
   statusCode: number;

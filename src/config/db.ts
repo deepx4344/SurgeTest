@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 import logger from "../middlewares/logger.js";
 import processConfig from "./env.js";
 const connectDB = async () => {
