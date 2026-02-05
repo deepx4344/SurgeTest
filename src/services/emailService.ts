@@ -22,13 +22,6 @@ export const verificationEmail = async (
         pass: processConfig.mailer.pass,
       },
     });
-    transporter.verify(function (error, success) {
-      if (error) {
-        logger.error(`Connection Error: `,error);
-      } else {
-        logger.info("Server is ready to send messages.");
-      }
-    });
     await transporter.sendMail({
       from: `verify@${processConfig.name}.com`,
       to: to,
