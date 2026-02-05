@@ -1,6 +1,6 @@
 import { InferSchemaType } from "mongoose";
 import { usersSchema } from "../models/users.js";
-import { testSchema } from "../models/test.js";
+import { testSchema } from "../models/load.js";
 
 export type User = InferSchemaType<typeof usersSchema>;
 
@@ -20,14 +20,14 @@ export interface ServiceErrorInput {
   details?: any;
 }
 
-export interface ApiResponseinput {
+export interface ApiResponseinput<T = unknown> {
   success: boolean;
   message: string;
   token?: string;
   tokens?: Tokens;
   user?: User;
-  data?: string;
-  datas?: string[]
+  data?: T;
+  datas?: T[];
   error?: string;
   errors?: Record<string, string[]>;
 }

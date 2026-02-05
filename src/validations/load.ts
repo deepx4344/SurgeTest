@@ -12,4 +12,4 @@ export const loadSchema = Joi.object({
   body: Joi.any(),
   concurrency: Joi.number().min(1).default(10),
   duration: Joi.number().min(1).default(30),
-}).unknown(true);
+}).unknown(false);

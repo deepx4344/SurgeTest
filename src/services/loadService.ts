@@ -1,7 +1,6 @@
 import Undici from "undici";
 
-import Test from "../models/test.js";
-import Tests from "../models/test.js";
+import Tests from "../models/load.js";
 
 class loadService {
   createTest = async (configs: any): Promise<string> => {
