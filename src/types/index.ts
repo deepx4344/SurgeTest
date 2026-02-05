@@ -1,25 +1,18 @@
-export interface User {
-  id: string;
-  registered: boolean;
-  email?: string;
+import { InferSchemaType } from "mongoose";
+import { usersSchema } from "../models/users.js";
+import { testSchema } from "../models/test.js";
+
+export type User =InferSchemaType<typeof usersSchema>
+
+export interface TestResults {
+  totalRequests: number;
+  successCount: number;
+  failCount: number;
+  errors: string[];
 }
-export class ServiceError extends Error {
-  statusCode: number;
-  code?: string;
-  details?: any;
-  constructor(
-    message: string,
-    statusCode: number = 500,
-    code?: string,
-    details?: any
-  ) {
-    super(message);
-    this.name = "ServiceError";
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
-  }
-}
+
+export type Test = InferSchemaType<typeof testSchema>
+
 export interface ServiceErrorInput {
   message: string;
   statusCode: number;
@@ -32,6 +25,7 @@ export interface ApiResponseinput {
   message: string;
   token?: string;
   tokens?: Tokens;
+  user?:User;
   data?: object | string;
   datas?: Record<string, string[]> | object[];
   error?: string;
@@ -49,7 +43,7 @@ export interface Tokens {
 }
 export interface configs {
   paid: boolean;
-  concurent: number;
+  concurrent: number;
   totalPerTest: number;
   testPerHour: number;
 }

@@ -2,16 +2,15 @@ import AuthService from "../services/authService.js";
 import asyncHandler from "../utils/async.js";
 import { createAPIResponse } from "../utils/index.js";
 import { ApiResponseinput, Tokens } from "../types/index.js";
-import processConfig from "../config/env.js";
+import cookieOptions from "../utils/cookie.js";
 const auth = new AuthService();
 
 export const register = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const token: string = await auth.register(email, password);
+  await auth.register(email, password);
   const dataToSend: ApiResponseinput = {
     success: true,
     message: "User Created Successfully",
-    token: token,
   };
   return res.status(201).json(createAPIResponse(dataToSend));
 });
@@ -23,14 +22,7 @@ export const login = asyncHandler(async (req, res) => {
     success: true,
     message: "User Logged In Successfully",
   };
-  res.cookie("tokens", tokens, {
-    signed: Boolean(processConfig.cookie.key),
-    maxAge:
-      parseInt(processConfig.JWTs.refresh.duration!, 10) * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: processConfig.enviroment === "production",
-    sameSite: "lax",
-  });
+  res.cookie("tokens", tokens, cookieOptions);
 
   return res.status(200).json(createAPIResponse(dataToSend));
 });
@@ -45,21 +37,24 @@ export const logout = asyncHandler(async (req, res) => {
   const tokens: Tokens = req.signedCookies["tokens"];
   const accessToken: string = tokens.accessToken;
   await auth.logout(accessToken);
-  res.clearCookie("tokens", {
-    signed: Boolean(processConfig.cookie.key),
-  });
+  res.clearCookie("tokens", cookieOptions);
   res.status(204).end();
 });
+
 export const refresh = asyncHandler(async (req, res) => {
   const tokens: Tokens = req.signedCookies["tokens"];
   const newToken: string = await auth.refresh(tokens.refreshToken);
   tokens.accessToken = newToken;
-  res.cookie("tokens", tokens, {
-    signed: Boolean(processConfig.cookie.key),
-    maxAge:
-      parseInt(processConfig.JWTs.refresh.duration!, 10) * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: processConfig.enviroment === "production",
-    sameSite: "lax",
-  });
+  res.cookie("tokens", tokens, cookieOptions);
+});
+
+export const me = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const userData = await auth.me(user.id);
+  const dataToSend: ApiResponseinput = {
+    success: true,
+    message: "User data retrieved Successfully",
+    user: userData,
+  };
+  res.status(200).json(createAPIResponse(dataToSend));
 });
