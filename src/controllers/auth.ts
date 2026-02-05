@@ -46,6 +46,7 @@ export const refresh = asyncHandler(async (req, res) => {
   const newToken: string = await auth.refresh(tokens.refreshToken);
   tokens.accessToken = newToken;
   res.cookie("tokens", tokens, cookieOptions);
+  res.status(200).end()
 });
 
 export const me = asyncHandler(async (req, res) => {

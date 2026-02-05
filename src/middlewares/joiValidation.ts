@@ -7,7 +7,7 @@ import { ApiResponseinput } from "../types/index.js";
 export const validateSchema = (
   schema: Joi.Schema,
   property: "body" | "query" | "params" = "body",
-  options: Joi.ValidationOptions = { abortEarly: false, stripUnknown: true }
+  options: Joi.ValidationOptions = { abortEarly: false }
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const target = (req as any)[property];

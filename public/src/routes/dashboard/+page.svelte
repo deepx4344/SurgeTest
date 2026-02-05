@@ -50,6 +50,8 @@
       const testId = res.test_id;
       if(!testId){
         status="Error: Server did not return a test ID"
+        running=false
+        if(pollInterval) clearInterval(pollInterval)
         return
       }
       status = `Test started: ${testId}. Waiting for results...`;

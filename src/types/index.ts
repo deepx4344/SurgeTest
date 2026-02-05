@@ -2,7 +2,7 @@ import { InferSchemaType } from "mongoose";
 import { usersSchema } from "../models/users.js";
 import { testSchema } from "../models/test.js";
 
-export type User =InferSchemaType<typeof usersSchema>
+export type User = InferSchemaType<typeof usersSchema>;
 
 export interface TestResults {
   totalRequests: number;
@@ -11,7 +11,7 @@ export interface TestResults {
   errors: string[];
 }
 
-export type Test = InferSchemaType<typeof testSchema>
+export type Test = InferSchemaType<typeof testSchema>;
 
 export interface ServiceErrorInput {
   message: string;
@@ -25,9 +25,9 @@ export interface ApiResponseinput {
   message: string;
   token?: string;
   tokens?: Tokens;
-  user?:User;
-  data?: object | string;
-  datas?: Record<string, string[]> | object[];
+  user?: User;
+  data?: string;
+  datas?: string[]
   error?: string;
   errors?: Record<string, string[]>;
 }
@@ -46,4 +46,19 @@ export interface configs {
   concurrent: number;
   totalPerTest: number;
   testPerHour: number;
+}
+
+export enum TestStatus {
+  pending = "PENDING",
+  running = "RUNNING",
+  completed = "COMPLETED",
+  failed = "FAILED",
+}
+
+export enum HttpMethods {
+  get = "GET",
+  post = "POST",
+  put = "PUT",
+  delete = "DELETE",
+  patch = "PATCH",
 }

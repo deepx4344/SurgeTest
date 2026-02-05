@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { HttpMethods, TestStatus } from "../types/index.js";
 
 export const testSchema = new mongoose.Schema(
   {
@@ -8,8 +9,8 @@ export const testSchema = new mongoose.Schema(
     },
     method: {
       type: String,
-      enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-      default: "GET",
+      enum: Object.values(HttpMethods),
+      required: true,
     },
     headers: {
       type: Map,
@@ -25,13 +26,19 @@ export const testSchema = new mongoose.Schema(
     },
     duration: {
       type: Number,
-      required: true, // in seconds
+      required: true,
       default: 30,
+    },
+    name: {
+      type: String,
+    },
+    description: {
+      type: String,
     },
     status: {
       type: String,
-      enum: ["pending", "running", "completed", "failed"],
-      default: "pending",
+      enum: Object.values(TestStatus),
+      default: TestStatus.pending,
     },
     results: {
       totalRequests: { type: Number, default: 0 },
@@ -46,5 +53,5 @@ export const testSchema = new mongoose.Schema(
 );
 
 testSchema.index({ status: 1 });
-const Test = mongoose.model("Test", testSchema);
-export default Test;
+const Tests = mongoose.model("Test", testSchema);
+export default Tests;
