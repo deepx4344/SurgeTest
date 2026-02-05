@@ -22,19 +22,19 @@ export const verificationEmail = async (
         pass: processConfig.mailer.pass,
       },
     });
-    await transporter.sendMail({
-      from: `verify@${processConfig.name}.com`,
-      to: to,
-      subject: "Verify Your Email",
-      html: format?.html,
-      text: format?.text,
-    });
     transporter.verify(function (error, success) {
       if (error) {
         logger.error(`Connection Error: `,error);
       } else {
         logger.info("Server is ready to send messages.");
       }
+    });
+    await transporter.sendMail({
+      from: `verify@${processConfig.name}.com`,
+      to: to,
+      subject: "Verify Your Email",
+      html: format?.html,
+      text: format?.text,
     });
   } catch (e) {
     logger.error("Error from send Emails", e);
